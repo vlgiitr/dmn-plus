@@ -46,7 +46,7 @@ class DMN(nn.Module):
         _, pred_id= torch.max(pred, dim=1)
         correct= (pred_id.data == answers.data)
         acc= torch.mean(correct.float())   
-        return loss+reg_loss, acc
+        return loss+para_loss, acc
     
     def interpret_indexed_tensor(self,var):
         if len(var.size()) == 3:
