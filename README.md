@@ -10,6 +10,6 @@ Pytorch implementation of [Dynamic Memory Network for Visual and Textual Questio
 
 ## Usage
  Run the main python code
- '''
+ ```
  python modelDMN.py
- '''
+ ```
