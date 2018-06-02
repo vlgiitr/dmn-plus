@@ -118,6 +118,6 @@ if __name__ == '__main__':
                     with open('models/task'+str(task_id)+'_epoch'+str(epoch)+'_run'+str(run)+'_acc'+str(test_acc/cnt)+'.pth', 'wb') as fp:
                         torch.save(model.state_dict(), fp)
                     with open('log.txt', 'a') as fp:
-                        fp.write('[Run '+str(run)+', Task '+str(task_id)+', Epoch '+str(epoch)+'] [Test] Accuracy : '+str(total_acc)+' + \n')
+                        fp.write('[itr '+str(itr)+', Task '+str(task_id)+', Epoch '+str(epoch)+'] [Test] Accuracy : '+str(total_acc)+' + \n')
 
                         
