@@ -45,7 +45,8 @@ if __name__ == '__main__':
                         count+= batch_size
                         
                         if batch_id %20 == 0:
-                            print 'task {task_id},epoch {epoch} training loss : {total_loss.data[0]: {10}.{8}},acc : {total_acc/count: {5}.{4}}, batch_id : {batch_id}'
+                            print('training error')
+                            print ('task '+str(task_id)+',epoch '+str(epoch)+',loss ' +str(loss.data[0])+',total accuracy : '+str(total_acc/cnt))
                         optim.step()
                     
                     '''Validation part'''
@@ -80,13 +81,15 @@ if __name__ == '__main__':
                         if early_stop_count > 20:
                             early_Stop_flag= True
                     
-                    print 'itr {itr}, task {task_id}, Epoch {epoch} validation accuracy : {total_acc: {5}.{4}}'
+                    print ('itr '+str(itr)+',task_id '+str(task_id)+',epoch '+str(epoch)+',total_acc '+str(total_acc))
+                    
                     with open('log.txt', 'a') as fp:
-                        fp.write('itr {itr}, task {task_id}, Epoch {epoch} validation accuracy : {total_acc: {5}.{4}}' + '\n')
+                        fp.write('itr '+str(itr)+', task_id '+str(task_id)+',epoch '+str(epoch)+',total_acc '+str(total_acc)+'+\n ')
                     if total_acc == 1.0:
                         break
                 else:
-                    print(f'itr {itr}, task {task_id} Early Stopping at Epoch {epoch}, validation accuracy : best_acc: {5}.{4}')
+                    print('iteration'+str(itr)+'task' +str(task_id)+' Early Stopping at Epoch'  +str(epoch)+'validation accuracy :' +str(best_acc))
+                    
             
             
             dataset.set_mode('test')
@@ -107,11 +110,14 @@ if __name__ == '__main__':
                     
                     test_acc += acc* batch_size 
                     count += batch_size
-                    print('itr {itr}, task {task_id}, Epoch {epoch} test accuracy : test_acc / count: {5}.{4}')
+                    print ('itr '+ str(itr)+'task =' +str(task_id)+ 'Epoch ' +str(epoch)+' test accuracy : '+str(test_acc / count))
                     
-                    os.makedirs('models', exist_ok= True)
-                    with open('models/task{task_id}_epoch{epoch}_itr{itr}_acc{test_acc/count}.pth', 'wb') as fp:
+                    
+                    
+                    os.makedirs('models',exist_ok= True)
+                    with open('models/task'+str(task_id)+'_epoch'+str(epoch)+'_run'+str(run)+'_acc'+str(test_acc/cnt)+'.pth', 'wb') as fp:
                         torch.save(model.state_dict(), fp)
                     with open('log.txt', 'a') as fp:
-                        fp.write('itr {itr}, task {task_id}, Epoch {epoch}] test accuracy : {total_acc: {5}.{4}}' + '\n')
+                        fp.write('[Run '+str(run)+', Task '+str(task_id)+', Epoch '+str(epoch)+'] [Test] Accuracy : '+str(total_acc)+' + \n')
+
                         
