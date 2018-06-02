@@ -1,3 +1,9 @@
+''' This file contains the code for training and testing the model. Adam optimizer is used for training with a 
+learning rate of 0.001 and a batch size of 128. Training is done for 256 epochs with early stopping 
+if validation loss doesn't decrease within last 20 epochs. Weights are initialized  using Xavier Initialization 
+except for word embeddings. Dropout and L2 are used as regularization methos on sentence encodings and answer module.'''
+
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as f
