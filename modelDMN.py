@@ -239,15 +239,15 @@ class DMN(nn.Module):
         if len(var.size()) == 3:
             for n, sentences in enumerate(var):
                 s= ' '.join([self.qa.IVOCAB[elem.data[0]] for elem in sentence])
-                print '{n}th batch, {i}th sentence, {s}'
+                print (str(n)+'th batch, '+str(i)+'th sentence, '+str(s))
                 
         elif len(var.size()) == 2:
             for n, sentence in enumerate(var):
                 s= ' '.join([self.qa.IVOCAB[elem.data[0]] for elem in sentence])
-                print '{n}th batch, {s}'
+                print (str(n)+'th batch, '+str(s))
                 
         elif len(var.size()) == 1:
             for n, token in enumerate(var):
                 s= self.qa.IVOCAB[token.data[0]]
-                print '{n}th of batch, {s}'
+                print (str(n)+'th of batch, '+str(s))
         
