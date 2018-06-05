@@ -3,17 +3,16 @@ learning rate of 0.001 and a batch size of 128. Training is done for 256 epochs 
 if validation loss doesn't decrease within last 20 epochs. Weights are initialized  using Xavier Initialization 
 except for word embeddings. Dropout and L2 are used as regularization methos on sentence encodings and answer module.'''
 
-
-import torch
-import torch.nn as nn
-import torch.nn.functional as f
 import os
+import torch
+import numpy as np
+import torch.nn as nn
 import torch.nn.init as init
+import torch.nn.functional as f
 import torch.autograd as Variable
 import torch.utils.data as DataLoader
-import numpy as np
-
-
+from modelDMN import DMN
+from dmn_loader import BabiDataSet, pad_collate
 
 
 if __name__ == '__main__':
