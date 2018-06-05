@@ -46,8 +46,8 @@ class BabiDataSet(Dataset):
 		self.QA.VOCAB = {'<PAD>': 0, '<EOS>':1}
 		self.QA.INV_VOCAB = {0:'<PAD>', 1:'<EOS>'}
 		self.train = self.get_processed_data(train_data)
-		self.val = [self.train[i][int(9*len(self.train[i])/10:] for i in range(3)] # splitting into 90/10 train/val dataset
-		self.train = [self.train[i][:int(9*len(self.train[i])/10] for i in range(3)] # splitting into 90/10 train/val dataset
+		self.val = [self.train[i][int(9*len(self.train[i])/10):] for i in range(3)] # splitting into 90/10 train/val dataset
+		self.train = [self.train[i][:int(9*len(self.train[i])/10)] for i in range(3)] # splitting into 90/10 train/val dataset
 		self.test = self.get_processed_data(test_data)
 	
 	def set_mode(self, mode):
@@ -75,10 +75,36 @@ class BabiDataSet(Dataset):
 		return contexts[index], questions[index], answers[index]
 	
 	def get_processed_data(self, raw_data):
-		''' TO DO '''
+		unindexed= get_processed_data(raw_data)
+	    questions=[]
+	    contexts= []
+	    answers= []
+	    for qa in unindexed:
+	        context= [c.lower().split()+ ['<EOS>'] for c in qa['C']]
+
+	        for con in context:
+	            for token in con:
+	                self.build_vocab(token)
+	        context= [[self.QA.VOCAB[token] for token in sentence] for sentence in context]
+	        question= qa['Q'].lower().split()+ ['<EOS>']
+
+	        for token in question:
+	            self.build_vocab(token)
+	        question= [self.QA.VOCAB[token] for token in question]
+	        
+	        self.build_vocab(qa['A'].lower())
+	        answer= self.QA.VOCAB[qa['A'].lower()]
+
+	        contexts.append(context)
+	        questions.append(question)
+	        answers.append(answer)
+	        return (contexts, questions, answers)
 
 	def build_vocab(self, token):
-		''' TO DO '''
+		if not token in self.QA.VOCAB:
+	        next_index= len(self.QA.VOCAB)
+	        self.QA.VOCAB[token]= next_index
+	        self.QA.IVOCAB[next_index]= token
 	
 	
 	
@@ -94,3 +120,53 @@ def get_train_test(task_id):
 	
 	return train, test
 	
+
+def build_vocab(raw_data):
+	lowered= raw_data.lower()
+	tokens= re.findall('[a-zA-Z]+',lowered)
+	types= set(tokens)
+	return types
+
+
+def get_unprocessed_data(raw_data):
+    tasks = []
+    task = None
+    data = raw_data.strip().split('\n')
+    for i, line in enumerate(data):
+        id = int(line[0:line.find(' ')])
+        if id == 1:
+            task = {"C": "", "Q": "", "A": "", "S": ""}
+            counter = 0
+            id_map = {}
+
+        line = line.strip()
+        line = line.replace('.', ' . ')
+        line = line[line.find(' ')+1:]
+        # if not a question
+        if line.find('?') == -1:
+            task["C"] += line + '<line>'
+            id_map[id] = counter
+            counter += 1
+        else:
+            idx = line.find('?')
+            tmp = line[idx+1:].split('\t')
+            task["Q"] = line[:idx]
+            task["A"] = tmp[1].strip()
+            task["S"] = [] # Supporting facts
+            for num in tmp[2].split():
+                task["S"].append(id_map[int(num.strip())])
+            tc = task.copy()
+            tc['C'] = tc['C'].split('<line>')[:-1]
+            tasks.append(tc)
+    return tasks
+
+
+
+
+
+if __name__ == '__main__':
+    dataset_train= BabiDataset(20, is_train= True)
+    train_loader= DataLoader(dataset_train,batch_size=2, shuffle=True,collate_fn= pad_collate)
+    for batch_idx, data in enumerate(train_loader):
+        contexts, questions, answers= data
+        break		
