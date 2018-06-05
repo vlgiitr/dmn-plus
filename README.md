@@ -1,11 +1,11 @@
 # Dynamic Memory Network Plus
 
-This is the Pytorch implementation of the paper [Dynamic Memory Network for Visual and Textual Question Answering](https://arxiv.org/abs/1603.01417). This paper is basically a much improved version of the original paper [Ask Me Anything: Dynamic Memory Networks for Natural Language Processing](https://arxiv.org/pdf/1506.07285.pdf). The main difference between these ideas is the input module and the memory module which has been explained in detail in the notebook file of this repo.
+This is the Pytorch implementation of the paper [Dynamic Memory Network for Visual and Textual Question Answering](https://arxiv.org/abs/1603.01417). This paper is an improved version of the original paper [Ask Me Anything: Dynamic Memory Networks for Natural Language Processing](https://arxiv.org/pdf/1506.07285.pdf). The major difference between these ideas is in the functioning of the input module and the memory module which has been explained in detail in the IPython notebook file of this repo.
 
 ![Input Module for DMNPlus](https://raw.githubusercontent.com/hardik2396/Dynamic-Memory-network-plus/master/inputModule.png?token=AOUtTAtTVniqEEuulNufBGDcuXUTSG5Qks5bGvMewA%3D%3D)
 
 ## Description
-- The whole architecture of DMN+ consists of mainly 4 modules: Input Module, Memory Module, Question Module & the Answer Module.
+- The whole architecture of DMN+ consists of 4 modules: Input Module, Memory Module, Question Module & the Answer Module.
 - The input module uses Positional Encoder and BidirectionalGRU to encode the input text representation in a much better way than DMN.
 - The memory module uses Attention based GRU to compute the contexual vector representing the input relevant to previous memory state and the question and finally uses this to update its next memory state.
 - The question module uses a simple GRU to encode the question to get its vector representation.
