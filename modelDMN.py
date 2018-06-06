@@ -2,7 +2,7 @@ import os
 import torch
 import torch.nn as nn
 import torch.nn.init as init
-import torch.nn.functional as f
+import torch.nn.functional as F
 import torch.autograd as Variable
 import torch.utils.data as DataLoader
 
@@ -229,7 +229,7 @@ class DMN(nn.Module):
         para_loss= 0
         for param in self.parameters():
             para_loss+= 0.001* torch.sum(param*param)
-        pred= f.softmax(output)
+        pred= F.softmax(output)
         _, pred_id= torch.max(pred, dim=1)
         correct= (pred_id.data == answers.data)
         acc= torch.mean(correct.float())   
