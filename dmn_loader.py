@@ -2,7 +2,7 @@
 import re
 import numpy as np
 from glob import glob
-from torch.utils.data import Dataloader
+from torch.utils.data import DataLoader
 from torch.utils.data.dataset import Dataset
 from torch.utils.data.dataloader import default_collate
 
@@ -75,7 +75,7 @@ class BabiDataSet(Dataset):
 		return contexts[index], questions[index], answers[index]
 	
 	def get_processed_data(self, raw_data):
-	    unindexed= get_processed_data(raw_data)
+	    unindexed= get_unprocessed_data(raw_data)
 	    questions=[]
 	    contexts= []
 	    answers= []
