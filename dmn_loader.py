@@ -75,7 +75,7 @@ class BabiDataSet(Dataset):
 		return contexts[index], questions[index], answers[index]
 	
 	def get_processed_data(self, raw_data):
-		unindexed= get_processed_data(raw_data)
+	    unindexed= get_processed_data(raw_data)
 	    questions=[]
 	    contexts= []
 	    answers= []
@@ -165,7 +165,7 @@ def get_unprocessed_data(raw_data):
 
 
 if __name__ == '__main__':
-    dataset_train= BabiDataset(20, is_train= True)
+    dataset_train= BabiDataset(20, mode='train') # Loading the dataset with task_id = 20
     train_loader= DataLoader(dataset_train,batch_size=2, shuffle=True,collate_fn= pad_collate)
     for batch_idx, data in enumerate(train_loader):
         contexts, questions, answers= data
