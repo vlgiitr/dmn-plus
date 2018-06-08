@@ -17,8 +17,8 @@ This is the Pytorch implementation of the paper [Dynamic Memory Network for Visu
   * Python 3.6
   * Pytorch
 ## Download Dataset
-chmod +x fetch_data.sh
-./fetch_data.sh
+  * chmod +x fetch_data.sh
+  * ./fetch_data.sh
 
 ## Usage
  Run the main python code
