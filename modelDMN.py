@@ -3,8 +3,8 @@ import torch
 import torch.nn as nn
 import torch.nn.init as init
 import torch.nn.functional as F
-import torch.autograd as Variable
-import torch.utils.data as DataLoader
+from torch.autograd import Variable
+from torch.utils.data import DataLoader
 
 class QuestionModule(nn.Module):
 	def __init__(self, vocab_size, hidden_size):
@@ -35,7 +35,7 @@ class InputModule(nn.Module):
 				init.xavier_normal(param)
 		self.dropout = nn.Dropout(0.1)
 
-	''' We will now define the encoding scheme which is positional encoding in the paper " Dynamic Memory Network for Textual and Visual 
+	''' We will now define the encoding scheme which is positional encoding in the paper " Dynamic Memory Network for Textual and Visual
     Question Answering '''
 	def positional_encoder(embedded_sentence):
 		# embedded_sentence.size() = (batch_size, num_sentences, num_tokens, embedding_length)
@@ -51,7 +51,7 @@ class InputModule(nn.Module):
 			for d in range(embedding_length):
 				x.append((1 - (j/(num_tokens-1))) - (d/(embedding_length-1)) * (1 - 2*j/(num_tokens-1)))
 			l.append(x)
-		
+
 		l = torch.FloatTensor(l)
 		l = l.unsqueeze(0) # adding an extra dimension at first place for batch_size
 		l = l.unsqueeze(1) # adding an extra dimension at sencond place for num_sentences
@@ -126,7 +126,7 @@ class AttnGRU(nn.Module):
 		for sen in range(facts.size()[1]):
 			fact = facts[:, sen, :]
 			g = G[:, sen]
-			if sen == 0: # Initialization for first sentence only 
+			if sen == 0: # Initialization for first sentence only
 				hi_1 = h_0.unsqueeze(0).expand_as(fact)
 			hi_1 = self.AttnGRUCell(fact, hi_1, g)
 		C = hi_1 # Final hidden vector as the contextual vector used for updating memory
@@ -189,29 +189,29 @@ class AnswerModule(nn.Module):
 	def forward(self, final_mem, questions):
 		final_mem = self.dropout(final_mem)
 		concat = torch.cat([final_mem, questions], dim=2).squeeze(1)
-		out = self.W(concat) # As per the paper, we are concatenating the final memory state m_T, and the question q and passing 
+		out = self.W(concat) # As per the paper, we are concatenating the final memory state m_T, and the question q and passing
 		# this resultant vector to a linear layer
 
 		return out
 
 
-''' We define the model for the network incorporating the input, question, answer and the episodic memory module. We use the Cross Entropy loss criterion for measuring loss'''    
+''' We define the model for the network incorporating the input, question, answer and the episodic memory module. We use the Cross Entropy loss criterion for measuring loss'''
 class DMN(nn.Module):
     def __init__(self, hidden_size, vocab_size, num_pass=3, qa=None):
         super(DMN,self).__init__()
         self.num_pass= num_pass
         self.qa= qa
-        self.word_embedding= nn.Embedding(vocab_size, hidden_size, padding_index=0, sparse=True)
+        self.word_embedding= nn.Embedding(vocab_size, hidden_size, padding_idx=0, sparse=True)
         init.uniform(self.word_embedding.state_dict()['weight'], a= -(3**0.5), b=3**0.5)
         self.criterion= nn.CrossEntropyLoss(size_average=False)
-        
-        self.input_module= input_module(vocab_size,hidden_size)   ##Vocab size refers to the size of vocabulary used
-        self.question_module= question_module(vocab_size, hidden_size) 
-        self.memory= episodic_memory(hidden_size)
-        self.answer_module= answer_module(vocab_size,hidden_size)
-        
+
+        self.input_module= InputModule(vocab_size,hidden_size)   ##Vocab size refers to the size of vocabulary used
+        self.question_module= QuestionModule(vocab_size, hidden_size)
+        self.memory= MemoryModule(hidden_size)
+        self.answer_module= AnswerModule(vocab_size,hidden_size)
+
     def forward(self, context, questions):
-        #facts.size()= (batch_size, num_sentences, embedding_length= hidden.size()) 
+        #facts.size()= (batch_size, num_sentences, embedding_length= hidden.size())
         #questions.size() = (batch_size, 1, embedding_length)
         facts= self.input_module(context, self.word_embedding)
         questions= self.question_module(questions, self.word_embedding)
@@ -220,9 +220,9 @@ class DMN(nn.Module):
             X= self.memory(facts, questions, X)
         pred= self.answer_module(X, questions)
         return pred_id
-    
+
     '''Total loss to be calculated '''
-    
+
     def loss(self,context, questions, targets):
         output= self.forward(context, questions)
         loss= self.criterion(output, targets)
@@ -232,22 +232,21 @@ class DMN(nn.Module):
         pred= F.softmax(output)
         _, pred_id= torch.max(pred, dim=1)
         correct= (pred_id.data == answers.data)
-        acc= torch.mean(correct.float())   
+        acc= torch.mean(correct.float())
         return loss+para_loss, acc
-    
+
     def interpret_indexed_tensor(self,var):
         if len(var.size()) == 3:
             for n, sentences in enumerate(var):
                 s= ' '.join([self.qa.IVOCAB[elem.data[0]] for elem in sentence])
                 print (str(n)+'th batch, '+str(i)+'th sentence, '+str(s))
-                
+
         elif len(var.size()) == 2:
             for n, sentence in enumerate(var):
                 s= ' '.join([self.qa.IVOCAB[elem.data[0]] for elem in sentence])
                 print (str(n)+'th batch, '+str(s))
-                
+
         elif len(var.size()) == 1:
             for n, token in enumerate(var):
                 s= self.qa.IVOCAB[token.data[0]]
                 print (str(n)+'th of batch, '+str(s))
-        
